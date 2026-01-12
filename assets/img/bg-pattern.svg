@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <defs>
+    <style>.s{fill:none;stroke:#d6d6d8;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}</style>
+  </defs>
+  <!-- Phone -->
+  <rect class="s" x="6" y="10" width="24" height="44" rx="5" ry="5" />
+  <circle class="s" cx="18" cy="48" r="1.6" />
+  <!-- Laptop -->
+  <rect class="s" x="40" y="16" width="44" height="28" rx="3" ry="3" />
+  <rect class="s" x="36" y="46" width="52" height="6" rx="2" ry="2" />
+  <!-- Watch -->
+  <rect class="s" x="92" y="12" width="16" height="22" rx="4" ry="4" />
+  <circle class="s" cx="100" cy="23" r="4" />
+  <!-- AirTag-like circle -->
+  <circle class="s" cx="18" cy="88" r="10" />
+  <!-- Tablet -->
+  <rect class="s" x="44" y="72" width="32" height="34" rx="4" ry="4" />
+</svg>
