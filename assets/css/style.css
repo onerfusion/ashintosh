@@ -159,6 +159,18 @@ h1, h2, h3, h4, h5, h6 {
   color: #34b7a7;
 }
 
+/* SVG social icons (transparent background) */
+.header-social-links a img.social-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.header-social-links a.facebook img.social-icon {
+  opacity: 0.95;
+}
+
 /*--------------------------------------------------------------
 # Navigation Menu
 --------------------------------------------------------------*/
