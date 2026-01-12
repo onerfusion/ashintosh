@@ -2,7 +2,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160" aria-hidden="true">
   <defs>
     <style>
-      .s{fill:none;stroke:#efefef;stroke-opacity:0.28;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+      /* very light strokes for background pattern */
+      .s{fill:none;stroke:#f7f7f7;stroke-opacity:0.16;stroke-width:1.0;stroke-linecap:round;stroke-linejoin:round}
     </style>
   </defs>
   <!-- Phone -->

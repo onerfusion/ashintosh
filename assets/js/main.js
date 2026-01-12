@@ -277,7 +277,7 @@
     let width = 0, height = 0;
     let particles = [];
     let mouse = { x: -9999, y: -9999 };
-    const colorBase = '26,115,232'; // bluish
+    const colorBase = '26,115,232'; // bluish (keep hue)
 
     function resize() {
       width = Math.max(300, Math.floor(window.innerWidth));
@@ -341,12 +341,13 @@
         p.x += p.vx;
         p.y += p.vy;
 
-        // draw lighter, more subtle dots
+        // draw darker, more visible dots on hover
         const disp = Math.min(1.0, Math.hypot(p.x - p.bx, p.y - p.by) / 6);
-        const alpha = 0.12 * (1 - Math.min(1, disp*1.6));
+        // increase base opacity so dots appear darker
+        const alpha = 0.32 * (1 - Math.min(1, disp*1.6));
         ctx.beginPath();
         ctx.fillStyle = `rgba(${colorBase}, ${alpha})`;
-        ctx.arc(p.x, p.y, 1.6 + disp*1.2, 0, Math.PI*2);
+        ctx.arc(p.x, p.y, 2.4 + disp*1.6, 0, Math.PI*2);
         ctx.fill();
       }
       requestAnimationFrame(animate);
