@@ -238,6 +238,36 @@
     });
   });
 
+  /* Antigravity / cursor parallax for hero */
+  (function(){
+    const panel = select('#hero-panel');
+    if (!panel) return;
+    const children = [...panel.querySelectorAll('[data-depth]')];
+    let mouseX = 0, mouseY = 0, rafId = null;
+
+    const onMove = (e) => {
+      const rect = panel.getBoundingClientRect();
+      mouseX = (e.clientX - rect.left) / rect.width - 0.5;
+      mouseY = (e.clientY - rect.top) / rect.height - 0.5;
+      if (!rafId) rafId = requestAnimationFrame(update);
+    };
+
+    const update = () => {
+      rafId = null;
+      children.forEach(el => {
+        const depth = parseFloat(el.getAttribute('data-depth')) || 0.08;
+        const moveX = -mouseX * depth * 40; // multiplier for strength
+        const moveY = -mouseY * depth * 30;
+        el.style.transform = `translate3d(${moveX}px, ${moveY}px, 0)`;
+      });
+    };
+
+    panel.addEventListener('mousemove', onMove);
+    panel.addEventListener('mouseleave', () => {
+      children.forEach(el => el.style.transform = 'translate3d(0,0,0)');
+    });
+  })();
+
   // Defensive cleanup removed to avoid syntax error; keep original behavior
 
 })()
