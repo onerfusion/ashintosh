@@ -238,15 +238,6 @@
     });
   });
 
-  // Defensive: remove accidental mobile overlay and restore scrolling
-  window.addEventListener('load', () => {
-    try {
-      let nav = select('#navbar');
-      if (nav && nav.classList.contains('navbar-mobile')) nav.classList.remove('navbar-mobile');
-      document.body.style.overflow = 'auto';
-    } catch (e) {
-      // ignore
-    }
-  });
+  // Defensive cleanup removed to avoid syntax error; keep original behavior
 
 })()
