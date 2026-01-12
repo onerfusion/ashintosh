@@ -798,6 +798,66 @@ section {
 .services .iconbox-red i {
   color: #ff5828;
 }
+
+/*--------------------------------------------------------------
+# Minimal Apple-like overrides
+--------------------------------------------------------------*/
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui;
+  color: #1c1c1e;
+  background: #fff;
+}
+
+#header {
+  background: #fff;
+  box-shadow: none;
+  padding: 18px 0;
+}
+#header .container-fluid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#header .logo {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: none;
+}
+.header-social-links { display: none; }
+
+#hero {
+  height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg,#ffffff 0%, #f7f7f7 100%);
+}
+#hero h1 {
+  font-size: 56px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+#hero h2 {
+  font-size: 18px;
+  color: #6e6e73;
+  margin-bottom: 24px;
+  font-weight: 400;
+}
+.btn-about {
+  display: inline-block;
+  padding: 10px 28px;
+  border-radius: 14px;
+  background: transparent;
+  border: 1px solid #1c1c1e;
+  color: #1c1c1e;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+}
+.btn-about:hover { background:#f2f2f2; }
+
+/* hide preloader for faster experience */
+#preloader { display: none; }
 .services .iconbox-red:hover .icon i {
   color: #fff;
 }
