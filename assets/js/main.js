@@ -268,6 +268,101 @@
     });
   })();
 
+  /* Water-like mouse ripple (canvas) inside hero */
+  (function(){
+    const canvas = select('#hero-canvas');
+    const panel = select('#hero-panel');
+    if (!canvas || !panel) return;
+    const ctx = canvas.getContext('2d');
+
+    let width = 0, height = 0;
+    let particles = [];
+    let mouse = { x: -9999, y: -9999, down: false };
+
+    function resize() {
+      const rect = panel.getBoundingClientRect();
+      width = Math.max(300, Math.floor(rect.width));
+      height = Math.max(200, Math.floor(rect.height));
+      canvas.width = width * devicePixelRatio;
+      canvas.height = height * devicePixelRatio;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+      buildGrid(rect.width, rect.height);
+    }
+
+    function buildGrid(w, h) {
+      particles = [];
+      const spacing = Math.max(24, Math.round(Math.min(w, h) / 14));
+      const cols = Math.floor(w / spacing) + 1;
+      const rows = Math.floor(h / spacing) + 1;
+      const xoff = (w - (cols-1)*spacing)/2;
+      const yoff = (h - (rows-1)*spacing)/2;
+      for (let r=0;r<rows;r++){
+        for (let c=0;c<cols;c++){
+          const bx = xoff + c*spacing;
+          const by = yoff + r*spacing;
+          particles.push({bx,by,x:bx,y:by,vx:0,vy:0});
+        }
+      }
+    }
+
+    function onMove(e){
+      const rect = panel.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    }
+
+    function onLeave(){
+      mouse.x = -9999; mouse.y = -9999;
+    }
+
+    function animate(){
+      ctx.clearRect(0,0,width,height);
+      const radius = Math.max(60, Math.min(width, height) / 6);
+      for (let i=0;i<particles.length;i++){
+        const p = particles[i];
+        // interaction force from mouse (repel)
+        const dx = p.x - mouse.x;
+        const dy = p.y - mouse.y;
+        const dist2 = dx*dx + dy*dy;
+        if (mouse.x>-9998 && dist2 < radius*radius){
+          const dist = Math.sqrt(dist2) || 1;
+          const force = (1 - (dist / radius)) * 3.2; // strength
+          p.vx += (dx/dist) * force;
+          p.vy += (dy/dist) * force;
+        }
+
+        // spring back to base
+        p.vx += (p.bx - p.x) * 0.06;
+        p.vy += (p.by - p.y) * 0.06;
+
+        // damping
+        p.vx *= 0.85;
+        p.vy *= 0.85;
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // draw
+        const disp = Math.min(1.0, Math.hypot(p.x - p.bx, p.y - p.by) / 6);
+        const alpha = 0.6 * (1 - Math.min(1, disp*1.6));
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(26, 115, 232, ${alpha})`;
+        ctx.arc(p.x, p.y, 2 + disp*1.6, 0, Math.PI*2);
+        ctx.fill();
+      }
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', resize);
+    panel.addEventListener('mousemove', onMove);
+    panel.addEventListener('mouseleave', onLeave);
+    // initialize
+    resize();
+    requestAnimationFrame(animate);
+  })();
+
   // Defensive cleanup removed to avoid syntax error; keep original behavior
 
 })()

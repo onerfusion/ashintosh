@@ -851,6 +851,18 @@ body {
   background-size: 200px 200px, cover;
   background-position: center top, center;
 }
+
+/* Canvas for hero interaction */
+.hero { position: relative; }
+.hero-canvas {
+  position: absolute;
+  inset: 0; /* top:0; right:0; bottom:0; left:0; */
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.hero-panel { position: relative; z-index: 2; }
 #hero h1 {
   font-size: 56px;
   font-weight: 700;
