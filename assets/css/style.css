@@ -902,6 +902,20 @@ body {
   box-sizing: border-box;
 }
 
+/* Hover animation for hero */
+.hero-panel {
+  transition: transform .28s cubic-bezier(.2,.9,.3,1), box-shadow .28s ease, background .28s ease;
+  will-change: transform;
+}
+.hero-panel:hover {
+  transform: translateY(-10px) scale(1.008);
+  box-shadow: 0 18px 40px rgba(18,18,20,0.08);
+}
+.hero-panel h1 { transition: transform .35s ease, color .2s ease; }
+.hero-panel:hover h1 { transform: translateY(-2px); color: var(--ui-text); }
+.hero-panel h2 { transition: transform .35s ease, opacity .25s ease; }
+.hero-panel:hover h2 { transform: translateY(-1px); opacity: 0.95; }
+
 /* Cards */
 .card {
   background: var(--ui-surface);
