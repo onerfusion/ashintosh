@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
   <defs>
-    <style>.s{fill:none;stroke:#bfbfc1;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}</style>
+    <style>.s{fill:none;stroke:#e9e9ea;stroke-opacity:0.45;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}</style>
   </defs>
   <!-- Phone -->
   <rect class="s" x="6" y="10" width="24" height="44" rx="5" ry="5" />
