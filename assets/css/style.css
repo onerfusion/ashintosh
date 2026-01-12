@@ -297,7 +297,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .navbar-mobile {
   position: fixed;
-  overflow: hidden;
+  overflow: auto;
   top: 0;
   right: 0;
   left: 0;
@@ -834,7 +834,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg,#ffffff 0%, #f7f7f7 100%);
+  background-image: url("../img/bg-pattern.svg"), linear-gradient(180deg,#ffffff 0%, #f7f7f7 100%);
+  background-repeat: repeat, no-repeat;
+  background-size: 160px 160px, cover;
+  background-position: center top, center;
 }
 #hero h1 {
   font-size: 56px;
