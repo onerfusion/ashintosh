@@ -375,7 +375,7 @@
 
     window.addEventListener('mousemove', onMove);
     window.addEventListener('resize', resize);
-    resolve();
+    resize();
     requestAnimationFrame(animate);
   })();
 
