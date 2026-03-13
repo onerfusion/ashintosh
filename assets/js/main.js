@@ -268,28 +268,17 @@
     });
   })();
 
-  /* Water-like mouse ripple (canvas) inside hero */
+  /* Global bee-swarm particles following mouse with water effect */
   (function(){
     const canvas = select('#hero-canvas');
-    const hero = select('#hero');
-    if (!canvas || !hero) return;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
     let width = 0, height = 0;
     let particles = [];
-    let mouse = { x: -9999, y: -9999 };
-    let active = false;
-    const colorBase = '26,115,232'; // bluish (keep hue)
-
-    function setActive(on) {
-      active = on;
-      canvas.classList.toggle('active', on);
-      document.body.classList.toggle('antigravity-active', on);
-      if (!on) {
-        mouse.x = -9999;
-        mouse.y = -9999;
-      }
-    }
+    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const swarmRadius = 80; // radius of bee swarm circle
+    const colorBase = '26,115,232'; // bluish
 
     function resize() {
       width = Math.max(300, Math.floor(window.innerWidth));
@@ -299,116 +288,94 @@
       canvas.style.width = width + 'px';
       canvas.style.height = height + 'px';
       ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-      buildGrid(width, height);
+      buildSwarm(width, height);
     }
 
-    function buildGrid(w, h) {
+    function buildSwarm(w, h) {
       particles = [];
-      const centerX = w / 2;
-      const centerY = h / 2;
-      const count = Math.floor((w * h) / 2600); // denser field
-      const maxRadius = Math.min(w, h) * 0.55;
+      const particleCount = 45; // number of particles in swarm
       
-      for (let i = 0; i < count; i++) {
-        const t = Math.random() * Math.PI * 2;
-        const r = maxRadius * (0.25 + Math.random() * 0.75);
-        const bx = centerX + Math.cos(t) * r;
-        const by = centerY + Math.sin(t) * r;
+      for (let i = 0; i < particleCount; i++) {
+        const angle = (i / particleCount) * Math.PI * 2;
+        const x = mouse.x + Math.cos(angle) * swarmRadius;
+        const y = mouse.y + Math.sin(angle) * swarmRadius;
         particles.push({
-          bx,
-          by,
-          x: bx,
-          y: by,
+          x,
+          y,
           vx: 0,
           vy: 0,
-          angle: t,
-          radius: r,
-          hue: (i / count) * 360
+          angle,
+          baseAngle: angle,
+          hue: (i / particleCount) * 360,
+          wobblePhase: Math.random() * Math.PI * 2
         });
       }
     }
 
     function onMove(e){
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
     }
 
     function animate(){
-      // Only draw when hero is being hovered (active = true)
-      if (!active) {
-        // Clear canvas completely when inactive
-        ctx.clearRect(0, 0, width, height);
-        requestAnimationFrame(animate);
-        return;
-      }
+      ctx.clearRect(0, 0, width, height);
 
-      // Only draw when active
-      ctx.clearRect(0,0,width,height);
-      const centerX = width / 2;
-      const centerY = height / 2;
-      const radius = Math.max(90, Math.min(width, height) / 3.5);
+      const time = Date.now() * 0.0008;
 
-      for (let i=0;i<particles.length;i++){
+      for (let i = 0; i < particles.length; i++){
         const p = particles[i];
 
-        // Rotate the orbit path for a gentle flow
-        p.angle += 0.00035;
-        const baseX = centerX + Math.cos(p.angle) * p.radius;
-        const baseY = centerY + Math.sin(p.angle) * p.radius;
+        // Gentle rotation around the swarm center
+        p.baseAngle += 0.012;
+        
+        // Wobble effect for water-like motion
+        const wobble = Math.sin(time + p.wobblePhase) * 20;
+        const baseX = mouse.x + Math.cos(p.baseAngle) * (swarmRadius + wobble);
+        const baseY = mouse.y + Math.sin(p.baseAngle) * (swarmRadius + wobble);
 
-        const dx = p.x - mouse.x;
-        const dy = p.y - mouse.y;
-        const dist2 = dx*dx + dy*dy;
-
-        if (active) {
-          const dist = Math.sqrt(dist2) || 1;
-          const maxDist = radius;
-          const norm = Math.min(1, dist / maxDist);
-          const pull = (1 - norm) * 0.22;
-          const ax = (mouse.x - p.x) / dist;
-          const ay = (mouse.y - p.y) / dist;
-          const swirl = 0.28;
-          const sx = -ay * swirl;
-          const sy = ax * swirl;
-
-          p.vx += ax * pull + sx * (1 - norm) * 0.38;
-          p.vy += ay * pull + sy * (1 - norm) * 0.38;
-          p.vx += (Math.random() - 0.5) * 0.04;
-          p.vy += (Math.random() - 0.5) * 0.04;
+        // Water physics - spring back to swarm position with damping
+        const dx = baseX - p.x;
+        const dy = baseY - p.y;
+        
+        p.vx += dx * 0.15;
+        p.vy += dy * 0.15;
+        
+        // Add swirl around cursor for water effect
+        const distToMouse = Math.hypot(p.x - mouse.x, p.y - mouse.y);
+        if (distToMouse > 1) {
+          const swirl = 0.18;
+          const normX = (p.x - mouse.x) / distToMouse;
+          const normY = (p.y - mouse.y) / distToMouse;
+          p.vx += -normY * swirl;
+          p.vy += normX * swirl;
         }
 
-        p.vx += (baseX - p.x) * 0.08;
-        p.vy += (baseY - p.y) * 0.08;
+        // Random turbulence for water ripple
+        p.vx += (Math.random() - 0.5) * 0.08;
+        p.vy += (Math.random() - 0.5) * 0.08;
 
-        p.vx *= 0.82;
-        p.vy *= 0.82;
+        // Damping
+        p.vx *= 0.88;
+        p.vy *= 0.88;
 
         p.x += p.vx;
         p.y += p.vy;
 
-        const drift = Math.hypot(p.x - baseX, p.y - baseY);
-        const alpha = 0.75 - Math.min(0.6, drift * 0.022);
+        // Draw particle
+        const distFromBase = Math.hypot(p.x - baseX, p.y - baseY);
+        const alpha = 0.7 - Math.min(0.5, distFromBase * 0.015);
         ctx.beginPath();
-        ctx.fillStyle = `hsla(${p.hue}, 82%, 64%, ${Math.max(0.12, alpha)})`;
-        ctx.arc(p.x, p.y, 2 + (drift * 0.1), 0, Math.PI*2);
+        ctx.fillStyle = `hsla(${p.hue}, 78%, 62%, ${Math.max(0.15, alpha)})`;
+        ctx.arc(p.x, p.y, 2.5 + (distFromBase * 0.08), 0, Math.PI * 2);
         ctx.fill();
       }
 
       requestAnimationFrame(animate);
     }
 
-    hero.addEventListener('mouseenter', () => {
-      setActive(true);
-      hero.addEventListener('mousemove', onMove);
-    });
-    hero.addEventListener('mouseleave', () => {
-      setActive(false);
-      hero.removeEventListener('mousemove', onMove);
-    });
-
+    window.addEventListener('mousemove', onMove);
     window.addEventListener('resize', resize);
-    resize();
+    resolve();
     requestAnimationFrame(animate);
   })();
 

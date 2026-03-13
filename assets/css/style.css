@@ -852,7 +852,7 @@ body {
   background-position: center top, center;
 }
 
-/* Canvas for hero interaction */
+/* Canvas for global mouse-following bee swarm particles */
 .hero { position: relative; }
 .hero-canvas {
   position: fixed;
@@ -861,12 +861,7 @@ body {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 1;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 240ms ease, visibility 240ms ease;
-}
-.hero-canvas.active {
+  z-index: 2;
   opacity: 1;
   visibility: visible;
 }
