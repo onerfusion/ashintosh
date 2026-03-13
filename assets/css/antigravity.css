@@ -12,6 +12,14 @@
   will-change: transform, opacity;
   transform: translate3d(-50%, -50%, 0);
   z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* Show cursor/ring only when active (hovering hero) */
+.antigravity-active .ag-cursor,
+.antigravity-active .ag-ring {
+  opacity: 1;
 }
 
 .ag-cursor {

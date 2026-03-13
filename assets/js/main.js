@@ -271,13 +271,25 @@
   /* Water-like mouse ripple (canvas) inside hero */
   (function(){
     const canvas = select('#hero-canvas');
-    if (!canvas) return;
+    const hero = select('#hero');
+    if (!canvas || !hero) return;
     const ctx = canvas.getContext('2d');
 
     let width = 0, height = 0;
     let particles = [];
     let mouse = { x: -9999, y: -9999 };
+    let active = false;
     const colorBase = '26,115,232'; // bluish (keep hue)
+
+    function setActive(on) {
+      active = on;
+      canvas.classList.toggle('active', on);
+      document.body.classList.toggle('antigravity-active', on);
+      if (!on) {
+        mouse.x = -9999;
+        mouse.y = -9999;
+      }
+    }
 
     function resize() {
       width = Math.max(300, Math.floor(window.innerWidth));
@@ -294,7 +306,7 @@
       particles = [];
       const centerX = w / 2;
       const centerY = h / 2;
-      const count = Math.floor((w * h) / 3200); // higher density for more particles
+      const count = Math.floor((w * h) / 2600); // denser field
       const maxRadius = Math.min(w, h) * 0.55;
       
       for (let i = 0; i < count; i++) {
@@ -322,11 +334,12 @@
       mouse.y = e.clientY - rect.top;
     }
 
-    function onLeave(){
-      mouse.x = -9999; mouse.y = -9999;
-    }
+    function animate(){
+      if (!active) {
+        requestAnimationFrame(animate);
+        return;
+      }
 
-    function animate(timestamp){
       ctx.clearRect(0,0,width,height);
       const centerX = width / 2;
       const centerY = height / 2;
@@ -335,7 +348,7 @@
       for (let i=0;i<particles.length;i++){
         const p = particles[i];
 
-        // Slowly rotate the orbit position
+        // Rotate the orbit path for a gentle flow
         p.angle += 0.00035;
         const baseX = centerX + Math.cos(p.angle) * p.radius;
         const baseY = centerY + Math.sin(p.angle) * p.radius;
@@ -344,58 +357,53 @@
         const dy = p.y - mouse.y;
         const dist2 = dx*dx + dy*dy;
 
-        // mouse attraction + swirl (water-like behavior)
-        const cursorActive = mouse.x > -9998;
-        if (cursorActive) {
+        if (active) {
           const dist = Math.sqrt(dist2) || 1;
           const maxDist = radius;
           const norm = Math.min(1, dist / maxDist);
-
-          // pull toward cursor with strength based on distance
-          const pull = (1 - norm) * 0.24;
+          const pull = (1 - norm) * 0.22;
           const ax = (mouse.x - p.x) / dist;
           const ay = (mouse.y - p.y) / dist;
-
-          // swirl / curl around cursor to simulate fluid flow
-          const swirl = 0.26;
+          const swirl = 0.28;
           const sx = -ay * swirl;
           const sy = ax * swirl;
 
-          p.vx += ax * pull + sx * (1 - norm) * 0.35;
-          p.vy += ay * pull + sy * (1 - norm) * 0.35;
-
-          // small noise for turbulence
+          p.vx += ax * pull + sx * (1 - norm) * 0.38;
+          p.vy += ay * pull + sy * (1 - norm) * 0.38;
           p.vx += (Math.random() - 0.5) * 0.04;
           p.vy += (Math.random() - 0.5) * 0.04;
         }
 
-        // spring back toward orbit path (keeps the field cohesive)
         p.vx += (baseX - p.x) * 0.08;
         p.vy += (baseY - p.y) * 0.08;
 
-        // damping (smooth fluid feel)
         p.vx *= 0.82;
         p.vy *= 0.82;
 
         p.x += p.vx;
         p.y += p.vy;
 
-        // color based on hue and distance from orbit path
         const drift = Math.hypot(p.x - baseX, p.y - baseY);
-        const alpha = 0.7 - Math.min(0.55, drift * 0.02);
+        const alpha = 0.75 - Math.min(0.6, drift * 0.022);
         ctx.beginPath();
-        ctx.fillStyle = `hsla(${p.hue}, 85%, 62%, ${Math.max(0.18, alpha)})`;
-        ctx.arc(p.x, p.y, 2 + (drift * 0.08), 0, Math.PI*2);
+        ctx.fillStyle = `hsla(${p.hue}, 82%, 64%, ${Math.max(0.12, alpha)})`;
+        ctx.arc(p.x, p.y, 2 + (drift * 0.1), 0, Math.PI*2);
         ctx.fill();
       }
 
       requestAnimationFrame(animate);
     }
 
+    hero.addEventListener('mouseenter', () => {
+      setActive(true);
+      hero.addEventListener('mousemove', onMove);
+    });
+    hero.addEventListener('mouseleave', () => {
+      setActive(false);
+      hero.removeEventListener('mousemove', onMove);
+    });
+
     window.addEventListener('resize', resize);
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseleave', onLeave);
-    // initialize
     resize();
     requestAnimationFrame(animate);
   })();

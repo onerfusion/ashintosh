@@ -862,6 +862,11 @@ body {
   height: 100vh;
   pointer-events: none;
   z-index: 1;
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+.hero-canvas.active {
+  opacity: 1;
 }
 .hero-panel { position: relative; z-index: 3; }
 #hero h1 {
