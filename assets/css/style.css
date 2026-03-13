@@ -863,10 +863,12 @@ body {
   pointer-events: none;
   z-index: 1;
   opacity: 0;
-  transition: opacity 240ms ease;
+  visibility: hidden;
+  transition: opacity 240ms ease, visibility 240ms ease;
 }
 .hero-canvas.active {
   opacity: 1;
+  visibility: visible;
 }
 .hero-panel { position: relative; z-index: 3; }
 #hero h1 {

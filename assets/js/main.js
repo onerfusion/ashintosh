@@ -335,11 +335,15 @@
     }
 
     function animate(){
+      // Only draw when hero is being hovered (active = true)
       if (!active) {
+        // Clear canvas completely when inactive
+        ctx.clearRect(0, 0, width, height);
         requestAnimationFrame(animate);
         return;
       }
 
+      // Only draw when active
       ctx.clearRect(0,0,width,height);
       const centerX = width / 2;
       const centerY = height / 2;

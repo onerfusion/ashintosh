@@ -1,7 +1,8 @@
-/* Antigravity style cursor + floating layer */
+/* Antigua style cursor + floating layer - COMPLETELY DISABLED */
 
 .ag-cursor,
 .ag-ring {
+  display: none !important;
   position: fixed;
   left: 0;
   top: 0;
@@ -19,10 +20,12 @@
 /* Show cursor/ring only when active (hovering hero) */
 .antigravity-active .ag-cursor,
 .antigravity-active .ag-ring {
-  opacity: 1;
+  display: none !important;
+  opacity: 0;
 }
 
 .ag-cursor {
+  display: none !important;
   width: 18px;
   height: 18px;
   border-radius: 50%;
@@ -31,6 +34,7 @@
 }
 
 .ag-ring {
+  display: none !important;
   width: 48px;
   height: 48px;
   border-radius: 50%;
