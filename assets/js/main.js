@@ -292,16 +292,27 @@
 
     function buildGrid(w, h) {
       particles = [];
-      // denser grid: divisor larger -> smaller spacing
-      const spacing = Math.max(10, Math.floor(Math.min(w, h) / 40));
-      const cols = Math.floor(w / spacing) + 1;
-      const rows = Math.floor(h / spacing) + 1;
-      for (let r=0;r<rows;r++){
-        for (let c=0;c<cols;c++){
-          const bx = c*spacing + (spacing/2);
-          const by = r*spacing + (spacing/2);
-          particles.push({bx,by,x:bx,y:by,vx:0,vy:0});
-        }
+      const centerX = w / 2;
+      const centerY = h / 2;
+      const count = Math.floor((w * h) / 3200); // higher density for more particles
+      const maxRadius = Math.min(w, h) * 0.55;
+      
+      for (let i = 0; i < count; i++) {
+        const t = Math.random() * Math.PI * 2;
+        const r = maxRadius * (0.25 + Math.random() * 0.75);
+        const bx = centerX + Math.cos(t) * r;
+        const by = centerY + Math.sin(t) * r;
+        particles.push({
+          bx,
+          by,
+          x: bx,
+          y: by,
+          vx: 0,
+          vy: 0,
+          angle: t,
+          radius: r,
+          hue: (i / count) * 360
+        });
       }
     }
 
@@ -315,41 +326,69 @@
       mouse.x = -9999; mouse.y = -9999;
     }
 
-    function animate(){
+    function animate(timestamp){
       ctx.clearRect(0,0,width,height);
-      const radius = Math.max(80, Math.min(width, height) / 3.6);
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const radius = Math.max(90, Math.min(width, height) / 3.5);
+
       for (let i=0;i<particles.length;i++){
         const p = particles[i];
+
+        // Slowly rotate the orbit position
+        p.angle += 0.00035;
+        const baseX = centerX + Math.cos(p.angle) * p.radius;
+        const baseY = centerY + Math.sin(p.angle) * p.radius;
+
         const dx = p.x - mouse.x;
         const dy = p.y - mouse.y;
         const dist2 = dx*dx + dy*dy;
-        if (mouse.x>-9998 && dist2 < radius*radius){
+
+        // mouse attraction + swirl (water-like behavior)
+        const cursorActive = mouse.x > -9998;
+        if (cursorActive) {
           const dist = Math.sqrt(dist2) || 1;
-          const force = (1 - (dist / radius)) * 4.0; // stronger
-          p.vx += (dx/dist) * force;
-          p.vy += (dy/dist) * force;
+          const maxDist = radius;
+          const norm = Math.min(1, dist / maxDist);
+
+          // pull toward cursor with strength based on distance
+          const pull = (1 - norm) * 0.24;
+          const ax = (mouse.x - p.x) / dist;
+          const ay = (mouse.y - p.y) / dist;
+
+          // swirl / curl around cursor to simulate fluid flow
+          const swirl = 0.26;
+          const sx = -ay * swirl;
+          const sy = ax * swirl;
+
+          p.vx += ax * pull + sx * (1 - norm) * 0.35;
+          p.vy += ay * pull + sy * (1 - norm) * 0.35;
+
+          // small noise for turbulence
+          p.vx += (Math.random() - 0.5) * 0.04;
+          p.vy += (Math.random() - 0.5) * 0.04;
         }
 
-        // spring back to base
-        p.vx += (p.bx - p.x) * 0.08;
-        p.vy += (p.by - p.y) * 0.08;
+        // spring back toward orbit path (keeps the field cohesive)
+        p.vx += (baseX - p.x) * 0.08;
+        p.vy += (baseY - p.y) * 0.08;
 
-        // damping
+        // damping (smooth fluid feel)
         p.vx *= 0.82;
         p.vy *= 0.82;
 
         p.x += p.vx;
         p.y += p.vy;
 
-        // draw darker, more visible dots on hover
-        const disp = Math.min(1.0, Math.hypot(p.x - p.bx, p.y - p.by) / 6);
-        // increase base opacity so dots appear darker
-        const alpha = 0.32 * (1 - Math.min(1, disp*1.6));
+        // color based on hue and distance from orbit path
+        const drift = Math.hypot(p.x - baseX, p.y - baseY);
+        const alpha = 0.7 - Math.min(0.55, drift * 0.02);
         ctx.beginPath();
-        ctx.fillStyle = `rgba(${colorBase}, ${alpha})`;
-        ctx.arc(p.x, p.y, 2.4 + disp*1.6, 0, Math.PI*2);
+        ctx.fillStyle = `hsla(${p.hue}, 85%, 62%, ${Math.max(0.18, alpha)})`;
+        ctx.arc(p.x, p.y, 2 + (drift * 0.08), 0, Math.PI*2);
         ctx.fill();
       }
+
       requestAnimationFrame(animate);
     }
 
